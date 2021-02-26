@@ -48,7 +48,7 @@ class loginScrean extends Component {
         .database()
         .ref('Users/' + User.phone)
         .set({name: this.state.name});
-      this.props.navigation.navigate('Home');
+      this.props.navigation.navigate('Users');
     }
   };
 

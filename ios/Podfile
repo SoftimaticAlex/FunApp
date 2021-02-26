@@ -1,0 +1,30 @@
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '9.0'
+
+target 'reactNativeFirebaseChat' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for reactNativeFirebaseChat
+
+  target 'reactNativeFirebaseChat-tvOSTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'reactNativeFirebaseChatTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+end
+
+target 'reactNativeFirebaseChat-tvOS' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for reactNativeFirebaseChat-tvOS
+
+
+
+end

@@ -6,6 +6,7 @@ import LogIn from "./src/containers/LogIn";
 import Users from "./src/containers/Users";
 import Contacts from "./src/containers/Contacts";
 import IndividualChat from "./src/containers/IndividualChat";
+import Profile from './src/containers/Profile'
 
 const AppNavigator = createStackNavigator(
   {
@@ -18,6 +19,9 @@ const AppNavigator = createStackNavigator(
       screen: IndividualChat,
       options: IndividualChat.navigationOptions,
     },
+    Profile: {
+      screen: Profile
+    }
   },
   {
     initialRouteName: "LogIn",

@@ -15,6 +15,7 @@ import firebase from 'firebase';
 import styles from '../constants/style';
 import User from '../User';
 
+import ImagePicker from 'react-native-image-picker';
 
 export default class ChatScreen extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -118,64 +119,45 @@ export default class ChatScreen extends Component {
         );
     };
 
-    handleChoosePhoto = () => {
-        this.setState({loading: true});
-    
-        const options = {
-          noData: true,
+    chooseFile = () => {
+        let options = {
+          title: 'Select Image',
+          customButtons: [
+            {
+              name: 'customOptionKey',
+              title: 'Choose Photo from Custom Option'
+            },
+          ],
+          storageOptions: {
+            skipBackup: true,
+            path: 'images',
+          },
         };
-        ImagePicker.launchImageLibrary(options, response => {
+        console.log(ImagePicker.showImagePicker)
+        ImagePicker.showImagePicker(options, (response) => {
           console.log('Response = ', response);
+    
           if (response.didCancel) {
             console.log('User cancelled image picker');
           } else if (response.error) {
             console.log('ImagePicker Error: ', response.error);
           } else if (response.customButton) {
-            console.log('User tapped custom button: ', response.customButton);
+            console.log(
+              'User tapped custom button: ',
+              response.customButton
+            );
+            alert(response.customButton);
           } else {
-            // Create a root reference
-            const storage = firebase.storage();
-            const storageRef = storage.ref('images/').child('image');
-    
-            let uri = response.uri;
-            let mime = 'image/jpg';
-            const uploadUri =
-              Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
-            let uploadBlob = null;
-            const imageRef = storageRef;
-            fs.readFile(uploadUri, 'base64')
-              .then(data => {
-                return Blob.build(data, {type: `${mime};BASE64`});
-              })
-              .then(blob => {
-                uploadBlob = blob;
-                return imageRef.put(blob, {contentType: mime});
-              })
-              .then(() => {
-                uploadBlob.close();
-                return imageRef.getDownloadURL();
-              })
-              .then(url => {
-                console.log(url);
-                User.image = url;
-                if (User.image !== this.state.image) {
-                  firebase
-                    .database()
-                    .ref('users')
-                    .child(User.phone)
-                    .set({name: User.name, image: url});
-                }
-              })
-              .catch(error => {
-                console.log(error.message);
-              });
-            this.setState({
-              image: response,
-            });
-            User.image = response;
+            let source = response;
+            // You can also display the image using data:
+            // let source = {
+            //   uri: 'data:image/jpeg;base64,' + response.data
+            // };
+            console.log(sourde);
           }
         });
       };
+    
 
     render() {
         let { height, width } = Dimensions.get('window');
@@ -193,7 +175,7 @@ export default class ChatScreen extends Component {
                         alignItems: 'center',
                         marginHorizontal: 5,
                     }}>
-                    <Button title="Choose photo" onPress={this.handleChoosePhoto} />
+                    {/* <Button title="Choose photo" onPress={this.chooseFile} /> */}
                     <TextInput
                         style={styles.input}
                         value={this.state.textMessage}

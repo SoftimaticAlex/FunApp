@@ -95,6 +95,7 @@ export default class HomeScreen extends Component {
   };
 
   componentDidMount() {
+    console.log(User);
     this.test().then((res) => {
       firebase
         .database()
@@ -179,6 +180,16 @@ export default class HomeScreen extends Component {
             accessibilityLabel="Learn more about this purple button"
           />
         </View>
+        <TouchableOpacity
+          onPress={() =>
+            this.props.navigation.navigate({
+              routeName: "Chat"
+            })
+          }
+          style={{ padding: 10, borderBottomColor: "#ccc", borderBottomWidth: 1 }}
+        >
+          <Text style={{ fontSize: 20 }}>CHAT GRUPAL</Text>
+        </TouchableOpacity>
         <FlatList
           data={this.state.usersToFilter}
           renderItem={this.renderRow}

@@ -6,8 +6,8 @@ import { GiftedChat } from 'react-native-gifted-chat';
 
 import FirebaseSDK from 'src/config/firebaseSDK';
 import Header from 'src/components/Header';
-
-import styles from './styles'
+import User from '../User';
+import styles from './styles';
 
 type Props = {
   name?: string,
@@ -21,8 +21,8 @@ class Chat extends React.Component<Props> {
 
   get user() {
     return {
-      name: this.props.navigation.state.params.name,
-      _id: FirebaseSDK.shared.uid,
+      name: User.name,
+      _id: User.phone,
     };
   }
 

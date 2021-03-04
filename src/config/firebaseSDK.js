@@ -38,7 +38,7 @@ class FirebaseSDK {
   }
 
   get ref() {
-    return firebase.database().ref('messages');
+    return firebase.database().ref('group').child('messages');
   }
 
   parse = snapshot => {

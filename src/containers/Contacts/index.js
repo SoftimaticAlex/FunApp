@@ -16,8 +16,8 @@ import firebase from "firebase";
 import User from "../User";
 
 export default class Contacts extends Component {
-  static navigationOptions = ({ navigation, route }) => ({
-    title: "Chats",
+  static defaultNavigationOptions = ({ navigation, route }) => ({
+    title: "Contactos",
     headerLeft: null,
     headerRight: () => (
       <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
@@ -40,6 +40,9 @@ export default class Contacts extends Component {
       dbRef.on("child_added", (val) => {
         let person = val.val();
         person.phone = val.key;
+        
+        if (person.perfil === 1)
+        if (person.residencia != User.residencia) return;
 
         if (person.phone === User.phone) {
           User.name = person.name;

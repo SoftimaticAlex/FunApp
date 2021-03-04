@@ -16,7 +16,7 @@ import firebase from "firebase";
 import User from "../User";
 
 export default class HomeScreen extends Component {
-  static navigationOptions = ({ navigation, route }) => ({
+  static defaultNavigationOptions = ({ navigation, route }) => ({
     title: "Chats",
     headerLeft: null,
     headerRight: () => (
@@ -101,6 +101,29 @@ export default class HomeScreen extends Component {
         .ref("Users")
         .on("child_added", (val) => {
           let person = val.val();
+
+          if (person.perfil === 1)
+            if (person.residencia != User.residencia) return;
+
+          person.phone = val.key;
+          this.usersToFilterHanlder(person);
+          if (person.phone === User.phone) {
+            User.name = person.name;
+          } else {
+            this.setState((prevState) => {
+              return {
+                users: [...prevState.users, person],
+              };
+            });
+          }
+        });
+
+      firebase
+        .database()
+        .ref("Users")
+        .on("child_changed", (val) => {
+          let person = val.val();
+          if (person.residencia != User.residencia) return;
           person.phone = val.key;
           this.usersToFilterHanlder(person);
           if (person.phone === User.phone) {
@@ -151,7 +174,7 @@ export default class HomeScreen extends Component {
                 routeName: "Contacts",
               })
             }
-            title="Agregar nuevo chat"
+            title="Contactos"
             color="#841584"
             accessibilityLabel="Learn more about this purple button"
           />

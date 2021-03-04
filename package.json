@@ -9,10 +9,12 @@
     "ios": "react-native run-ios"
   },
   "dependencies": {
+    "@react-native-community/async-storage": "^1.12.1",
     "firebase": "^6.0.4",
     "materialize-css": "^1.0.0-rc.2",
     "native-base": "^2.12.1",
     "react": "16.8.3",
+    "react-input-file": "^0.2.6",
     "react-native": "0.59.8",
     "react-native-action-button": "^2.8.5",
     "react-native-gesture-handler": "^1.10.2",

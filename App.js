@@ -13,7 +13,7 @@ const AppNavigator = createStackNavigator(
     Chat: { screen: Chat },
     LogIn: { screen: LogIn },
     Users: { screen: Users, options: Users.navigationOptions },
-    Contacts: { screen: Contacts },
+    Contacts: { screen: Contacts, options: Contacts.navigationOptions },
     IndividualChat: {
       screen: IndividualChat,
       options: IndividualChat.navigationOptions,
@@ -21,7 +21,7 @@ const AppNavigator = createStackNavigator(
   },
   {
     initialRouteName: "LogIn",
-    headerMode: "none",
+    headerMode: 'screen',
   }
 );
 

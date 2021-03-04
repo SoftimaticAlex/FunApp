@@ -17,8 +17,8 @@ import User from '../User';
 
 
 export default class ChatScreen extends Component {
-    static defaultNavigationOptions = ({ navigation }) => {
-        console.log(navigation);
+    static navigationOptions = ({ navigation }) => {
+       
         return {
             title: navigation.state.params.name,
         }

@@ -16,10 +16,10 @@ import firebase from "firebase";
 import User from "../User";
 
 export default class HomeScreen extends Component {
-  static defaultNavigationOptions = ({ navigation, route }) => ({
+  static navigationOptions = ({ navigation, route }) => ({
     title: "Chats",
     headerLeft: null,
-    headerRight: () => (
+    headerRight:
       <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
         <Image
           source={require("../images/user.png")}
@@ -27,7 +27,7 @@ export default class HomeScreen extends Component {
           style={{ width: 32, height: 32, marginRight: 10 }}
         />
       </TouchableOpacity>
-    ),
+    ,
   });
 
   state = {

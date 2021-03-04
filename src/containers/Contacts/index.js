@@ -16,9 +16,8 @@ import firebase from "firebase";
 import User from "../User";
 
 export default class Contacts extends Component {
-  static defaultNavigationOptions = ({ navigation, route }) => ({
+  static navigationOptions = ({ navigation, route }) => ({
     title: "Contactos",
-    headerLeft: null,
     headerRight: () => (
       <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
         <Image

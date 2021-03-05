@@ -96,8 +96,6 @@ class loginScrean extends Component {
               User.perfil = user.perfil;
               this.props.navigation.navigate("Users");
             });
-
-
         }
       } else {
         AsyncStorage.setItem("userPhone", this.state.phone);

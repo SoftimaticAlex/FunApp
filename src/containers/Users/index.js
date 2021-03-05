@@ -77,17 +77,33 @@ export default class HomeScreen extends Component {
       .on("child_added", (res) => {
         if (this.validateUsersExistence()) {
           const person = this.getUserData(res.key);
-          if (this.validateUser(res.key)) return;
 
-          if (person) {
-            this.setState((prevState) => {
-              return {
-                ids: [...prevState.ids, res.key],
-                users: [...this.state.users],
-                usersToFilter: [...this.state.usersToFilter, person],
-              };
-            });
-          }
+          if (this.validateUser(res.key)) return;
+          const el = this;
+
+          firebase.database().ref('messages')
+            .child(res.key)
+            .child(User.phone).limitToLast(1).once('value')
+            .then(function (snapshot) {
+
+              snapshot.forEach(function (childSnapshot) {
+                const data = childSnapshot.val();
+                person.lastMessage = data.message;
+                person.read = data.read;
+
+                if (person) {
+                  el.setState((prevState) => {
+                    return {
+                      ids: [...prevState.ids, res.key],
+                      users: [...el.state.users],
+                      usersToFilter: [...el.state.usersToFilter, person],
+                    };
+                  });
+                }
+
+              });
+            })
+
         } else {
           this.setState((prevState) => {
             return {
@@ -100,11 +116,11 @@ export default class HomeScreen extends Component {
       });
   };
 
+
+
   usersToFilterHanlder = (person) => {
     const ids = this.state.ids;
-    console.log('filter first step');
     if (!ids.includes(person.phone)) return;
-    console.log('filter second step');
     this.setState((prevState) => {
       return {
         ids: [...this.state.ids],
@@ -122,33 +138,33 @@ export default class HomeScreen extends Component {
         .ref("Users")
         .on("child_added", (val) => {
           const el = this;
+
+          let person = val.val();
+          if (person.perfil === 1)
+            if (person.residencia != User.residencia) return;
+          person.phone = val.key;
           firebase.database().ref('messages')
-            .child(User.phone)
-            .child(val.key).limitToLast(1).once('value')
+            .child(val.key)
+            .child(User.phone).limitToLast(1).once('value')
             .then(function (snapshot) {
               snapshot.forEach(function (childSnapshot) {
-
-                let person = val.val();
-                if (person.perfil === 1)
-                  if (person.residencia != User.residencia) return;
                 const data = childSnapshot.val();
-
-                person.phone = val.key;
                 person.lastMessage = data.message;
-                // person.read = data.read;
-
-                el.usersToFilterHanlder(person);
-                if (person.phone === User.phone) {
-                  User.name = person.name;
-                } else {
-
-                  el.setState((prevState) => {
-                    return {
-                      users: [...prevState.users, person],
-                    };
-                  });
-                }
+                person.read = data.read;
               });
+            })
+            .finally(fn => {
+              el.usersToFilterHanlder(person);
+              if (person.phone === User.phone) {
+                User.name = person.name;
+              } else {
+
+                el.setState((prevState) => {
+                  return {
+                    users: [...prevState.users, person],
+                  };
+                });
+              }
             });
 
 
@@ -170,7 +186,14 @@ export default class HomeScreen extends Component {
       >
         <View style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row' }}>
           <Text style={{ fontSize: 20 }}>{item.name}</Text>
-          {/* {item.read ? <Text >{item.lastMessage}</Text> : <Text style={{ color: 'gray' }}>{item.lastMessage}</Text>} */}
+          {item.read ? <Text>
+            <Image
+              source={require('../images/doble_blue_check.png')}
+              style={{ width: 15, height: 15, marginRight: 0, marginLeft: 0 }}
+            />{item.lastMessage}</Text> : <Text style={{ color: 'gray' }}><Image
+              source={require('../images/check_blue.png')}
+              style={{ width: 15, height: 15, marginRight: 5, marginLeft: 5 }}
+            />{item.lastMessage}</Text>}
 
         </View>
       </TouchableOpacity>

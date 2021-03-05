@@ -19,7 +19,7 @@ import ImagePicker from 'react-native-image-picker';
 
 export default class ChatScreen extends Component {
     static navigationOptions = ({ navigation }) => {
-       
+
         return {
             title: navigation.state.params.name,
         }
@@ -46,9 +46,20 @@ export default class ChatScreen extends Component {
             .child(User.phone)
             .child(this.state.person.phone)
             .on('child_added', value => {
+                const data = value.val();
+                if (data.from !== User.phone) {
+                    data.read = true;
+                    firebase.database().ref('messages').child(User.phone).child(data.from).child(value.key).set({
+                        from: data.from,
+                        message: data.message,
+                        time: data.time,
+                        read: true
+                    });
+                }
+
                 this.setState(prevState => {
                     return {
-                        messageList: [...prevState.messageList, value.val()],
+                        messageList: [...prevState.messageList, data],
                     };
                 });
             });
@@ -77,18 +88,26 @@ export default class ChatScreen extends Component {
                 .child(User.phone)
                 .child(this.state.person.phone)
                 .push().key;
+
             let updates = {};
+
             let message = {
                 message: this.state.textMessage,
                 time: firebase.database.ServerValue.TIMESTAMP,
                 from: User.phone,
+                read: false
             };
+
+
+
             updates[
                 'messages/' + User.phone + '/' + this.state.person.phone + '/' + msgId
-            ] = message;
+            ] = { ...message, read: true };
+
             updates[
                 'messages/' + this.state.person.phone + '/' + User.phone + '/' + msgId
             ] = message;
+
             firebase
                 .database()
                 .ref()
@@ -121,43 +140,43 @@ export default class ChatScreen extends Component {
 
     chooseFile = () => {
         let options = {
-          title: 'Select Image',
-          customButtons: [
-            {
-              name: 'customOptionKey',
-              title: 'Choose Photo from Custom Option'
+            title: 'Select Image',
+            customButtons: [
+                {
+                    name: 'customOptionKey',
+                    title: 'Choose Photo from Custom Option'
+                },
+            ],
+            storageOptions: {
+                skipBackup: true,
+                path: 'images',
             },
-          ],
-          storageOptions: {
-            skipBackup: true,
-            path: 'images',
-          },
         };
         console.log(ImagePicker.showImagePicker)
         ImagePicker.showImagePicker(options, (response) => {
-          console.log('Response = ', response);
-    
-          if (response.didCancel) {
-            console.log('User cancelled image picker');
-          } else if (response.error) {
-            console.log('ImagePicker Error: ', response.error);
-          } else if (response.customButton) {
-            console.log(
-              'User tapped custom button: ',
-              response.customButton
-            );
-            alert(response.customButton);
-          } else {
-            let source = response;
-            // You can also display the image using data:
-            // let source = {
-            //   uri: 'data:image/jpeg;base64,' + response.data
-            // };
-            console.log(sourde);
-          }
+            console.log('Response = ', response);
+
+            if (response.didCancel) {
+                console.log('User cancelled image picker');
+            } else if (response.error) {
+                console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+                console.log(
+                    'User tapped custom button: ',
+                    response.customButton
+                );
+                alert(response.customButton);
+            } else {
+                let source = response;
+                // You can also display the image using data:
+                // let source = {
+                //   uri: 'data:image/jpeg;base64,' + response.data
+                // };
+                console.log(sourde);
+            }
         });
-      };
-    
+    };
+
 
     render() {
         let { height, width } = Dimensions.get('window');

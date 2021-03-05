@@ -20,7 +20,8 @@ class loginScrean extends Component {
     name: "",
   };
 
- async componentDidMount() {
+  async componentDidMount() {
+   
     const valuePhone = await AsyncStorage.getItem("userPhone");
     const valueUserName = await AsyncStorage.getItem("userName")
     if (valuePhone && valueUserName) {
@@ -51,7 +52,7 @@ class loginScrean extends Component {
       const db = firebase.database();
       if (val) {
         if (val === this.state.phone) {
-          
+
           db.ref("/Users/" + val)
             .once("value")
             .then((res) => {
@@ -92,6 +93,7 @@ class loginScrean extends Component {
               const user = res.val();
               User.name = user.name;
               User.residencia = user.residencia;
+              User.perfil = user.perfil;
               this.props.navigation.navigate("Users");
             });
 
@@ -113,6 +115,7 @@ class loginScrean extends Component {
             const user = res.val();
             User.name = user.name;
             User.residencia = user.residencia;
+            User.perfil = user.perfil;
             this.props.navigation.navigate("Users");
           });
 

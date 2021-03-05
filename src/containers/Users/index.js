@@ -14,18 +14,37 @@ import {
 
 import firebase from "firebase";
 import User from "../User";
+{/* <Button
+onPress={() =>
+  this.props.navigation.navigate({
+    routeName: "Contacts",
+  })
+}
+title="Contactos"
+color="#841584"
+accessibilityLabel="Learn more about this purple button"
+/> */}
 
 export default class HomeScreen extends Component {
+
+
+  _logOut = async () => {
+    await AsyncStorage.clear();
+    this.props.navigation.navigate({
+      routeName: "LogIn"
+    });
+  };
+
   static navigationOptions = ({ navigation, route }) => ({
     title: "Chats",
-    headerLeft: null,
+    headerLeft: <TouchableOpacity onPress={this._logOut}>
+      <Text>  LogOut  </Text>
+    </TouchableOpacity>,
     headerRight:
-      <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-        <Image
-          source={require("../images/user.png")}
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{ width: 32, height: 32, marginRight: 10 }}
-        />
+      <TouchableOpacity onPress={() => navigation.navigate({
+        routeName: "Contacts",
+      })}>
+        <Text>Nuevo Chat +  </Text>
       </TouchableOpacity>
     ,
   });
@@ -83,8 +102,9 @@ export default class HomeScreen extends Component {
 
   usersToFilterHanlder = (person) => {
     const ids = this.state.ids;
+    console.log('filter first step');
     if (!ids.includes(person.phone)) return;
-
+    console.log('filter second step');
     this.setState((prevState) => {
       return {
         ids: [...this.state.ids],
@@ -101,49 +121,41 @@ export default class HomeScreen extends Component {
         .database()
         .ref("Users")
         .on("child_added", (val) => {
-          let person = val.val();
+          const el = this;
+          firebase.database().ref('messages')
+            .child(User.phone)
+            .child(val.key).limitToLast(1).once('value')
+            .then(function (snapshot) {
+              snapshot.forEach(function (childSnapshot) {
 
-          if (person.perfil === 1)
-            if (person.residencia != User.residencia) return;
+                let person = val.val();
+                if (person.perfil === 1)
+                  if (person.residencia != User.residencia) return;
+                const data = childSnapshot.val();
 
-          person.phone = val.key;
-          this.usersToFilterHanlder(person);
-          if (person.phone === User.phone) {
-            User.name = person.name;
-          } else {
-            this.setState((prevState) => {
-              return {
-                users: [...prevState.users, person],
-              };
+                person.phone = val.key;
+                person.lastMessage = data.message;
+                // person.read = data.read;
+
+                el.usersToFilterHanlder(person);
+                if (person.phone === User.phone) {
+                  User.name = person.name;
+                } else {
+
+                  el.setState((prevState) => {
+                    return {
+                      users: [...prevState.users, person],
+                    };
+                  });
+                }
+              });
             });
-          }
-        });
 
-      firebase
-        .database()
-        .ref("Users")
-        .on("child_changed", (val) => {
-          let person = val.val();
-          if (person.residencia != User.residencia) return;
-          person.phone = val.key;
-          this.usersToFilterHanlder(person);
-          if (person.phone === User.phone) {
-            User.name = person.name;
-          } else {
-            this.setState((prevState) => {
-              return {
-                users: [...prevState.users, person],
-              };
-            });
-          }
+
         });
     });
   }
 
-  _logOut = async () => {
-    await AsyncStorage.clear();
-    this.props.navigation.navigate("Auth");
-  };
 
   renderRow = ({ item }) => {
     return (
@@ -156,7 +168,11 @@ export default class HomeScreen extends Component {
         }
         style={{ padding: 10, borderBottomColor: "#ccc", borderBottomWidth: 1 }}
       >
-        <Text style={{ fontSize: 20 }}>{item.name}</Text>
+        <View style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row' }}>
+          <Text style={{ fontSize: 20 }}>{item.name}</Text>
+          {/* {item.read ? <Text >{item.lastMessage}</Text> : <Text style={{ color: 'gray' }}>{item.lastMessage}</Text>} */}
+
+        </View>
       </TouchableOpacity>
     );
   };
@@ -165,21 +181,8 @@ export default class HomeScreen extends Component {
     if (!User.phone) {
       this.props.navigation.navigate("Auth");
     }
-
     return (
       <SafeAreaView>
-        <View style={styles.position}>
-          <Button
-            onPress={() =>
-              this.props.navigation.navigate({
-                routeName: "Contacts",
-              })
-            }
-            title="Contactos"
-            color="#841584"
-            accessibilityLabel="Learn more about this purple button"
-          />
-        </View>
         <TouchableOpacity
           onPress={() =>
             this.props.navigation.navigate({

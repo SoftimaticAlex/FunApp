@@ -6,7 +6,8 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
     "android": "react-native run-android",
-    "ios": "react-native run-ios"
+    "ios": "react-native run-ios",
+    "postversion": "react-native-version"
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.12.1",
@@ -27,12 +28,13 @@
     "react-navigation": "^3.11.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.5",
-    "@babel/runtime": "^7.4.5",
+    "@babel/core": "^7.13.10",
+    "@babel/runtime": "^7.13.10",
     "babel-jest": "^24.8.0",
     "ember-cli-materialize": "^0.22.0",
     "jest": "^24.8.0",
     "metro-react-native-babel-preset": "^0.54.1",
+    "react-native-version": "^4.0.0",
     "react-test-renderer": "16.8.3"
   },
   "jest": {

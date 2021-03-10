@@ -63,6 +63,30 @@ export default class ChatScreen extends Component {
                     };
                 });
             });
+        // firebase
+        //     .database()
+        //     .ref('messages')
+        //     .child(User.phone)
+        //     .child(this.state.person.phone)
+        //     .on('child_changed', value => {
+                
+        //         const data = value.val();
+        //         if (data.from !== User.phone) {
+        //             data.read = true;
+        //             firebase.database().ref('messages').child(User.phone).child(data.from).child(value.key).set({
+        //                 from: data.from,
+        //                 message: data.message,
+        //                 time: data.time,
+        //                 read: true
+        //             });
+        //         }
+
+        //         this.setState(prevState => {
+        //             return {
+        //                 messageList: [...prevState.messageList, data],
+        //             };
+        //         });
+        //     });
     }
 
     handleChange = key => val => {
@@ -98,8 +122,6 @@ export default class ChatScreen extends Component {
                 read: false
             };
 
-
-
             updates[
                 'messages/' + User.phone + '/' + this.state.person.phone + '/' + msgId
             ] = { ...message, read: true };
@@ -128,12 +150,23 @@ export default class ChatScreen extends Component {
                     borderRadius: 10,
                     marginBottom: 10,
                 }}>
-                <Text style={{ color: '#fff', padding: 7, fontSize: 16 }}>
-                    {item.message}
-                </Text>
-                <Text style={{ color: '#eee', padding: 3, fontSize: 12 }}>
-                    {this.convertTime(item.time)}
-                </Text>
+                <View style={{ display: 'flex', flexDirection: 'row', alignContent: 'space-between', width: '100%' }}>
+                    <Text style={{ color: '#fff', padding: 7, fontSize: 16 }}>
+                        {item.message}
+                    </Text>
+                    <Text style={{ color: '#eee', padding: 7, fontSize: 12 }}>
+                        {this.convertTime(item.time)}
+                    </Text>
+                    {item.read ? <Text>
+                        <Image
+                            source={require('../images/doble_blue_check.png')}
+                            style={{ width: 15, height: 15, marginRight: 0, marginLeft: 0 }}
+                        />{item.lastMessage}</Text> : <Text style={{ color: 'gray' }}><Image
+                            source={require('../images/check_blue.png')}
+                            style={{ width: 15, height: 15, marginRight: 5, marginLeft: 5 }}
+                        />{item.lastMessage}</Text>}
+                </View>
+
             </View>
         );
     };

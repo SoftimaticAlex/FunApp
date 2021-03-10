@@ -65,7 +65,6 @@ export default class HomeScreen extends Component {
   };
 
   getUserData = (key) => {
-    console.log(this.state.users);
     return this.state.users.filter((c) => c.phone === key)[0];
   };
 
@@ -131,7 +130,7 @@ export default class HomeScreen extends Component {
   };
 
   componentDidMount() {
-    console.log(User);
+    
     this.test().then((res) => {
       firebase
         .database()
@@ -142,18 +141,23 @@ export default class HomeScreen extends Component {
           let person = val.val();
           if (person.perfil === 1)
             if (person.residencia != User.residencia) return;
+
           person.phone = val.key;
+
           firebase.database().ref('messages')
             .child(val.key)
             .child(User.phone).limitToLast(1).once('value')
             .then(function (snapshot) {
+
               snapshot.forEach(function (childSnapshot) {
                 const data = childSnapshot.val();
                 person.lastMessage = data.message;
                 person.read = data.read;
               });
+
             })
             .finally(fn => {
+              
               el.usersToFilterHanlder(person);
               if (person.phone === User.phone) {
                 User.name = person.name;

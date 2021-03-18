@@ -77,7 +77,6 @@ export default class ChatScreen extends Component {
         //     .child(User.phone)
         //     .child(this.state.person.phone)
         //     .on('child_changed', value => {
-
         //         const data = value.val();
         //         if (data.from !== User.phone) {
         //             data.read = true;

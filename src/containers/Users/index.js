@@ -155,14 +155,17 @@ export default class HomeScreen extends Component {
             .child(User.phone)
             .child(val.key).limitToLast(1).once('value')
             .then(function (snapshot) {
+
               snapshot.forEach(function (childSnapshot) {
                 const data = childSnapshot.val();
                 person.lastMessage = data.message;
                 person.read = data.read;
                 person.countUnreadMessage = 0;
               });
+
             })
             .finally(fn => {
+              
               el.usersToFilterHanlder(person);
               if (person.phone === User.phone) {
                 User.name = person.name;

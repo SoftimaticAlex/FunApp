@@ -26,7 +26,7 @@ accessibilityLabel="Learn more about this purple button"
 /> */}
 
 export default class HomeScreen extends Component {
-
+  _isMounted = false;
 
   _logOut = async () => {
     await AsyncStorage.clear();
@@ -49,11 +49,19 @@ export default class HomeScreen extends Component {
     ,
   });
 
-  state = {
-    users: [],
-    usersToFilter: [],
-    ids: [],
-  };
+  constructor(props) {
+    super(props);
+    User.actual = 'users';
+    this.state = state = {
+      users: [],
+      usersToFilter: [],
+      ids: [],
+    };
+    console.log(User);
+  }
+
+
+
 
   validateUsersExistence = () => {
     if (this.state.users.length === 0) return false;
@@ -76,20 +84,17 @@ export default class HomeScreen extends Component {
       .on("child_added", (res) => {
         if (this.validateUsersExistence()) {
           const person = this.getUserData(res.key);
-
           if (this.validateUser(res.key)) return;
           const el = this;
-
           firebase.database().ref('messages')
-            .child(res.key)
-            .child(User.phone).limitToLast(1).once('value')
+            .child(User.phone)
+            .child(res.key).limitToLast(1).once('value')
             .then(function (snapshot) {
-
               snapshot.forEach(function (childSnapshot) {
                 const data = childSnapshot.val();
                 person.lastMessage = data.message;
                 person.read = data.read;
-
+                person.countUnreadMessage = 0;
                 if (person) {
                   el.setState((prevState) => {
                     return {
@@ -99,18 +104,18 @@ export default class HomeScreen extends Component {
                     };
                   });
                 }
-
-              });
-            })
-
+              })
+            });
         } else {
-          this.setState((prevState) => {
-            return {
-              ids: [...prevState.ids, res.key],
-              users: [...this.state.users],
-              usersToFilter: [...this.state.usersToFilter],
-            };
-          });
+          if (this._isMounted) {
+            this.setState((prevState) => {
+              return {
+                ids: [...prevState.ids, res.key],
+                users: [...this.state.users],
+                usersToFilter: [...this.state.usersToFilter],
+              };
+            });
+          }
         }
       });
   };
@@ -120,17 +125,19 @@ export default class HomeScreen extends Component {
   usersToFilterHanlder = (person) => {
     const ids = this.state.ids;
     if (!ids.includes(person.phone)) return;
-    this.setState((prevState) => {
-      return {
-        ids: [...this.state.ids],
-        users: [...this.state.users],
-        usersToFilter: [...this.state.usersToFilter, person],
-      };
-    });
+    if (this._isMounted) {
+      this.setState((prevState) => {
+        return {
+          ids: [...this.state.ids],
+          users: [...this.state.users],
+          usersToFilter: [...this.state.usersToFilter, person],
+        };
+      });
+    }
   };
 
   componentDidMount() {
-    
+    this._isMounted = true;
     this.test().then((res) => {
       firebase
         .database()
@@ -145,36 +152,89 @@ export default class HomeScreen extends Component {
           person.phone = val.key;
 
           firebase.database().ref('messages')
-            .child(val.key)
-            .child(User.phone).limitToLast(1).once('value')
+            .child(User.phone)
+            .child(val.key).limitToLast(1).once('value')
             .then(function (snapshot) {
-
               snapshot.forEach(function (childSnapshot) {
                 const data = childSnapshot.val();
                 person.lastMessage = data.message;
                 person.read = data.read;
+                person.countUnreadMessage = 0;
               });
-
             })
             .finally(fn => {
-              
               el.usersToFilterHanlder(person);
               if (person.phone === User.phone) {
                 User.name = person.name;
               } else {
-
-                el.setState((prevState) => {
-                  return {
-                    users: [...prevState.users, person],
-                  };
-                });
+                if (el._isMounted) {
+                  el.setState((prevState) => {
+                    return {
+                      users: [...prevState.users, person],
+                    };
+                  });
+                }
               }
+            }).then(res => {
+              firebase.database().ref('messages')
+                .child(User.phone)
+                .child(val.key).on('child_added', res => {
+                  const data = res.val();
+                  const users = this.state.usersToFilter;
+
+                  const user = users.findIndex(c => c.phone === data.from);
+                  if (user >= 0) {
+                    if (!data.read) {
+                      console.log('added', data)
+                      users[user].countUnreadMessage += 1;
+                      users[user].lastMessage = data.message;
+                      users[user].read = data.read;
+                      if (this._isMounted) {
+                        this.setState((prevState) => {
+                          return {
+                            usersToFilter: [...users],
+                          };
+                        });
+                      }
+                    }
+                  }
+                });
+            }).then(res => {
+              firebase.database().ref('messages')
+                .child(User.phone)
+                .child(val.key).on('child_changed', res => {
+                  const data = res.val();
+                  const users = this.state.usersToFilter;
+                  const user = users.findIndex(c => c.phone === data.from);
+                  if (user >= 0) {
+                    console.log(data)
+                    if (data.read) {
+                      users[user].countUnreadMessage = 0;
+                    } else {
+                      users[user].countUnreadMessage += 1;
+                    }
+                    users[user].read = data.read;
+                    if (this._isMounted) {
+                      this.setState((prevState) => {
+                        return {
+                          usersToFilter: [...users],
+                        };
+                      });
+                    }
+                  }
+                });
             });
-
-
         });
     });
   }
+
+  componentWillUnmount() {
+    this._isMounted = false;
+    this.setState = (state, callback) => {
+      return;
+    };
+  }
+
 
 
   renderRow = ({ item }) => {
@@ -198,7 +258,7 @@ export default class HomeScreen extends Component {
               source={require('../images/check_blue.png')}
               style={{ width: 15, height: 15, marginRight: 5, marginLeft: 5 }}
             />{item.lastMessage}</Text>}
-
+          <Text>{item.countUnreadMessage}</Text>
         </View>
       </TouchableOpacity>
     );

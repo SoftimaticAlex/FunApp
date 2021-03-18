@@ -18,15 +18,19 @@ import User from '../User';
 import ImagePicker from 'react-native-image-picker';
 
 export default class ChatScreen extends Component {
+
+    _isMounted = false;
+    _isOnIt = false;
     static navigationOptions = ({ navigation }) => {
 
         return {
-            title: navigation.state.params.name,
+            title: navigation.state.params.name,              
         }
     };
 
     constructor(props) {
         super(props);
+        User.actual = 'IndividualChat';
         this.state = {
             person: {
                 name: props.navigation.state.params.name,
@@ -35,11 +39,14 @@ export default class ChatScreen extends Component {
             textMessage: '',
             messageList: [],
         };
+        console.log(User);
     }
 
 
     componentDidMount() {
-        console.log(User)
+        this._isMounted = true;
+        this._isOnIt = true;
+        if(this._isOnIt)
         firebase
             .database()
             .ref('messages')
@@ -56,12 +63,13 @@ export default class ChatScreen extends Component {
                         read: true
                     });
                 }
-
-                this.setState(prevState => {
-                    return {
-                        messageList: [...prevState.messageList, data],
-                    };
-                });
+                if (this._isMounted) {
+                    this.setState(prevState => {
+                        return {
+                            messageList: [...prevState.messageList, data],
+                        };
+                    });
+                }
             });
         // firebase
         //     .database()
@@ -69,7 +77,7 @@ export default class ChatScreen extends Component {
         //     .child(User.phone)
         //     .child(this.state.person.phone)
         //     .on('child_changed', value => {
-                
+
         //         const data = value.val();
         //         if (data.from !== User.phone) {
         //             data.read = true;
@@ -88,6 +96,15 @@ export default class ChatScreen extends Component {
         //         });
         //     });
     }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+        this._isOnIt = false;
+        this.setState = (state, callback) => {
+            return;
+        };
+    }
+
 
     handleChange = key => val => {
         this.setState({ [key]: val });
@@ -217,10 +234,20 @@ export default class ChatScreen extends Component {
             <SafeAreaView>
                 <FlatList
                     style={{ padding: 10, height: height * 0.8 }}
-                    data={this.state.messageList}
+                    data={this.state.messageList.sort(function (a, b) {
+                        if (a.time > b.time) {
+                            return 1;
+                        }
+                        if (a.time < b.time) {
+                            return -1;
+                        }
+                        // a must be equal to b
+                        return 0;
+                    })}
                     renderItem={this.renderRow}
                     keyExtractor={(item, index) => index.toString()}
                 />
+
                 <View
                     style={{
                         flexDirection: 'row',

@@ -16,6 +16,7 @@
     "firebase": "^6.0.4",
     "materialize-css": "^1.0.0-rc.2",
     "native-base": "^2.12.1",
+    "package": "^1.0.1",
     "react": "16.8.3",
     "react-input-file": "^0.2.6",
     "react-native": "0.59.8",

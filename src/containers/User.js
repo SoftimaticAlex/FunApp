@@ -3,7 +3,8 @@ const User = {
     name: null,
     image: null,
     residencia: null,
-    perfil: null
+    perfil: null,
+    actual:''
   };
   export default User;
   

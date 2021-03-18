@@ -9,15 +9,15 @@ class FirebaseSDK {
   }
 
   init = () =>
-    firebase.initializeApp({
-      apiKey: 'AIzaSyDDg8aAdKOiIT7_syFbWV2-TokiJ2qAt8s',
-      authDomain: 'https://chat-69135.firebaseapp.com/',
-      databaseURL: 'https://chat-69135-default-rtdb.firebaseio.com/',
-      projectId: 'chat-69135',
-      // storageBucket: STORAGE_BUCKET,
-      messagingSenderId: '328692848179',
-      appId: 'chat-69135',
-      // measurementId: MEASUMENT_ID,
+    firebase.initializeApp( {
+      apiKey: "AIzaSyDDg8aAdKOiIT7_syFbWV2-TokiJ2qAt8s",
+      authDomain: "chat-69135.firebaseapp.com",
+      databaseURL: "https://chat-69135-default-rtdb.firebaseio.com",
+      projectId: "chat-69135",
+      storageBucket: "chat-69135.appspot.com",
+      messagingSenderId: "328692848179",
+      appId: "1:328692848179:web:8f4b6d46326fba6df33546",
+      measurementId: "G-HFNL45M96W"
     });
 
   observeAuth = () =>
